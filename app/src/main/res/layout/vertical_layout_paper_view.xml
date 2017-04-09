@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/colorAccent">
+
+    <TextView
+        android:id="@+id/paper_view_name"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="8dp"
+        tools:text="章节名称" />
+
+    <RelativeLayout
+        android:id="@+id/paper_view_info"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_margin="8dp">
+
+        <cn.xfangfang.paperviewdemo.BatteryAndClockView
+            android:id="@+id/paper_view_battery_clock"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"/>
+
+        <TextView
+            android:id="@+id/paper_view_extra_info"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:textSize="13sp"
+            tools:text="额外信息"/>
+        <TextView
+            android:id="@+id/paper_view_position"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:textSize="13sp"
+            android:layout_centerVertical="true"
+            tools:text="阅读位置" />
+    </RelativeLayout>
+
+    <cn.xfangfang.paperviewdemo.PaperLayout
+        android:id="@+id/paper_layout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@id/paper_view_info"
+        android:layout_below="@id/paper_view_name" />
+
+
+    <cn.xfangfang.paperviewdemo.PaperVerticalLayout
+        android:id="@+id/paperp_layout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@id/paper_view_info"
+        android:layout_below="@id/paper_view_name"
+        android:visibility="gone"/>
+
+
+
+</RelativeLayout>
