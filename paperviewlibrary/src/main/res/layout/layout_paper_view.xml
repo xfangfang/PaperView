@@ -38,7 +38,7 @@
             android:layout_height="wrap_content"
             android:layout_centerInParent="true"
             android:textSize="13sp"
-            tools:text="额外信息"/>
+            tools:text="信息"/>
 
         <TextView
             android:id="@+id/paper_view_position"
