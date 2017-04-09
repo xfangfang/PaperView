@@ -1,0 +1,9 @@
+<resources>
+    <declare-styleable name="PaperView">
+        <attr name="textLine" format="integer" />
+        <attr name="text" format="string" />
+        <attr name="textColor" format="color" />
+        <attr name="textSize" format="dimension" />
+    </declare-styleable>
+
+</resources>
