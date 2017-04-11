@@ -14,7 +14,7 @@ import android.widget.Scroller;
 import java.util.ArrayList;
 
 
-class PaperLayout extends ViewGroup{
+public class PaperLayout extends ViewGroup{
 
     /**
      * 用于完成滚动操作的实例
@@ -334,7 +334,7 @@ class PaperLayout extends ViewGroup{
         rightView.setPadding(padding,0,padding,0);
     }
 
-    interface StateListener{
+    public interface StateListener{
         void toStart();
         void toEnd();
         void centerClicked();

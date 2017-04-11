@@ -5,7 +5,7 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
-   <cn.xfangfang.paperviewdemo.PaperView
+   <cn.xfangfang.paperviewlibrary.PaperView
        android:id="@+id/paper_view"
        android:layout_width="match_parent"
        android:layout_height="match_parent"

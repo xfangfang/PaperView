@@ -4,6 +4,9 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.widget.Toast;
 
+import cn.xfangfang.paperviewlibrary.PaperLayout;
+import cn.xfangfang.paperviewlibrary.PaperView;
+
 public class MainActivity extends AppCompatActivity {
 
     PaperView paperView;
