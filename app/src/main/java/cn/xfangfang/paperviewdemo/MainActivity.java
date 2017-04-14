@@ -1,5 +1,6 @@
 package cn.xfangfang.paperviewdemo;
 
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.widget.Toast;
@@ -27,9 +28,10 @@ public class MainActivity extends AppCompatActivity {
         paperView.setText(getResources().getString(R.string.three_country));
         paperView.setTextLine(17);
         paperView.setTextSize(17);
-        paperView.setTextColor("#8a434343");
+        paperView.setTextColor("#00ff00");
         paperView.setExtraInfo("haha");
-        paperView.setPage(100);
+        paperView.setBackgroundColor(Color.RED);
+        paperView.setPage(0);
         paperView.setOnPaperViewStateListener(new PaperLayout.StateListener() {
             @Override
             public void toStart() {
@@ -46,8 +48,6 @@ public class MainActivity extends AppCompatActivity {
                 Toast.makeText(getBaseContext(),"点击了中部",Toast.LENGTH_SHORT).show();
             }
         });
-//        paperView.setVerticalMode();
-//        paperView.setExtraInfo("haha");
     }
 
 }

@@ -6,7 +6,6 @@ import android.text.Layout;
 import android.text.StaticLayout;
 import android.text.TextPaint;
 import android.util.AttributeSet;
-import android.util.Log;
 
 import java.util.ArrayList;
 
@@ -14,7 +13,7 @@ import java.util.ArrayList;
  * Created by FANGs on 2017/3/22.
  */
 
-class AutoTextView extends android.support.v7.widget.AppCompatTextView {
+public class AutoTextView extends android.support.v7.widget.AppCompatTextView {
 
     private int mLineY;
     private int mViewWidth;
@@ -52,7 +51,7 @@ class AutoTextView extends android.support.v7.widget.AppCompatTextView {
         mViewHeight = getHeight();
         wordHeight = (int) (paint.getFontMetrics().descent - paint.getFontMetrics().ascent);
         mSpaceHeight = (mViewHeight - mLines * wordHeight) / (mLines - 1);
-        Log.e(TAG, "onDraw: padding"+getPaddingLeft()+" "+getPaddingRight()+" width "+mViewWidth );
+//        Log.e(TAG, "onDraw: padding"+getPaddingLeft()+" "+getPaddingRight()+" width "+mViewWidth );
         startX = getPaddingLeft();
 
         drawText(canvas);
@@ -61,7 +60,7 @@ class AutoTextView extends android.support.v7.widget.AppCompatTextView {
 
     private void drawText(Canvas canvas) {
         TextPaint paint = getPaint();
-        Log.e(TAG, "drawText: 颜色"+textColor );
+//        Log.e(TAG, "drawText: 颜色"+textColor );
         paint.setColor(textColor);
         paint.drawableState = getDrawableState();
         String text = (String) getText();

@@ -6,7 +6,6 @@ import android.content.res.TypedArray;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -95,15 +94,15 @@ public class PaperView extends FrameLayout {
             public ArrayList<String> toPrePage() {
 
 
-                Log.e(TAG, "当前页码 " + (currentPage + 1));
+//                Log.e(TAG, "当前页码 " + (currentPage + 1));
                 if (currentPage == 0) {
-                    Log.e(TAG, "1上一条错了 当前页码 " + (currentPage + 1));
+//                    Log.e(TAG, "1上一条错了 当前页码 " + (currentPage + 1));
                     updatePosition();
                     return null;
                 }
                 currentPage--;
                 if (currentPage == 0) {
-                    Log.e(TAG, "2上一条错了 当前页码 " + (currentPage + 1));
+//                    Log.e(TAG, "2上一条错了 当前页码 " + (currentPage + 1));
                     updatePosition();
                     return new ArrayList<>();
                 }
@@ -117,15 +116,15 @@ public class PaperView extends FrameLayout {
             public ArrayList<String> toNextPage() {
 
 
-                Log.e(TAG, "当前页码 " + (currentPage + 1));
+//                Log.e(TAG, "当前页码 " + (currentPage + 1));
                 if (currentPage == lineText.size() - 1) {
-                    Log.e(TAG, "3上一条错了 当前页码 " + (currentPage + 1));
+//                    Log.e(TAG, "3上一条错了 当前页码 " + (currentPage + 1));
                     updatePosition();
                     return null;
                 }
                 currentPage++;
                 if (currentPage == lineText.size() - 1) {
-                    Log.e(TAG, "4上一条错了 当前页码 " + (currentPage + 1));
+//                    Log.e(TAG, "4上一条错了 当前页码 " + (currentPage + 1));
                     updatePosition();
                     return new ArrayList<>();
                 }
@@ -145,7 +144,7 @@ public class PaperView extends FrameLayout {
         paperView_batteryAndClock.unregisterBatteryReceiver();
     }
 
-    private static final String TAG = "PaperView";
+//    private static final String TAG = "PaperView";
 
     private void updatePosition() {
         paperView_position.setText((currentPage + 1) + "/" + (lineText.size()));
@@ -195,7 +194,7 @@ public class PaperView extends FrameLayout {
         }
         if (!isAdded) ans.add(res);
         wholePage = ans.size();
-        Log.e(TAG, "splitArticle: 分割完毕 页数 " + wholePage);
+//        Log.e(TAG, "splitArticle: 分割完毕 页数 " + wholePage);
         return ans;
     }
 
@@ -238,6 +237,10 @@ public class PaperView extends FrameLayout {
     public void setTextColor(String color) {
         this.paperView_textColor = Color.parseColor(color);
         this.paperLayout.setTextColor(paperView_textColor);
+        this.paperView_batteryAndClock.setPaintColor(paperView_textColor);
+        this.paperView_extraInfo.setTextColor(paperView_textColor);
+        this.paperView_position.setTextColor(paperView_textColor);
+        this.paperView_name.setTextColor(paperView_textColor);
     }
 
     public void setTextSize(float textSize) {
@@ -275,7 +278,7 @@ public class PaperView extends FrameLayout {
 
     public void setPage(int pageNum) {
         if (lineText == null) {
-            Log.e(TAG, "setPage: 还没设置文字呢");
+//            Log.e(TAG, "setPage: 还没设置文字呢");
             return;
         }
         this.currentPage = pageNum - 1;

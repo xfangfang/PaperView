@@ -33,7 +33,7 @@ dependencies {
     testCompile 'junit:junit:4.12'
 }
 
-version = "1.0.0"
+version = "1.0.2"
 
 def siteUrl = 'https://github.com/xfangfang/PaperView' // 项目主页。
 def gitUrl = 'git@github.com:xfangfang/PaperView.git' // Git仓库的url。

@@ -3,7 +3,6 @@ package cn.xfangfang.paperviewlibrary;
 import android.content.Context;
 import android.graphics.Typeface;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.MotionEvent;
 import android.view.VelocityTracker;
 import android.view.View;
@@ -138,25 +137,25 @@ public class PaperLayout extends ViewGroup{
 //                    | |___| |
 //                    |___|___|
 //
-                    Log.e(TAG, "onTouchEvent: 单击事件" );
+//                    Log.e(TAG, "onTouchEvent: 单击事件" );
                     if (mxUp > getMeasuredWidth()*0.25
                                 && mxUp < getMeasuredWidth()*0.75
                                 && myUp > getMeasuredHeight() * 0.25
                                 && myUp < getMeasuredHeight() *0.75) {
                             //点击在中部区域
-                        Log.e(TAG, "onTouchEvent: 中部点击" );
+//                        Log.e(TAG, "onTouchEvent: 中部点击" );
                             if(stateListener != null) {
                                 stateListener.centerClicked();
                             }
                     }else if(mxUp < 0.5 * getMeasuredWidth()){
-                        Log.e(TAG, "onTouchEvent: 左部点击" );
+//                        Log.e(TAG, "onTouchEvent: 左部点击" );
                         if(pageListener != null){
                             ArrayList<String> lineText = pageListener.toPrePage();
                             if(lineText == null){
                                 if(stateListener != null){
                                     stateListener.toStart();
                                 }
-                                Log.e(TAG, "onTouchEvent: 到头了" );
+//                                Log.e(TAG, "onTouchEvent: 到头了" );
                                 leftView.setText("");
                             }else {
                                 AutoTextView temp = rightView;
@@ -173,14 +172,14 @@ public class PaperLayout extends ViewGroup{
                             }
                         }
                     }else{
-                        Log.e(TAG, "onTouchEvent: 右部点击" );
+//                        Log.e(TAG, "onTouchEvent: 右部点击" );
                         if(pageListener != null){
                             ArrayList<String> lineText = pageListener.toNextPage();
                             if(lineText == null){
                                 if(stateListener != null){
                                     stateListener.toEnd();
                                 }
-                                Log.e(TAG, "onTouchEvent: 触礁了"  );
+//                                Log.e(TAG, "onTouchEvent: 触礁了"  );
                                 rightView.setText("");
                             }else {
                                 AutoTextView temp = leftView;
@@ -211,7 +210,7 @@ public class PaperLayout extends ViewGroup{
                             if(stateListener != null){
                                 stateListener.toStart();
                             }
-                            Log.e(TAG, "onTouchEvent: 到头了" );
+//                            Log.e(TAG, "onTouchEvent: 到头了" );
                             leftView.setText("");
                         }else {
                             AutoTextView temp = rightView;
@@ -232,7 +231,7 @@ public class PaperLayout extends ViewGroup{
                             if(stateListener != null){
                                 stateListener.toEnd();
                             }
-                            Log.e(TAG, "onTouchEvent: 触礁了"  );
+//                            Log.e(TAG, "onTouchEvent: 触礁了"  );
                             rightView.setText("");
                         }else {
                             AutoTextView temp = leftView;
@@ -284,10 +283,7 @@ public class PaperLayout extends ViewGroup{
         this.pageListener = l;
     }
 
-    /**
-     * 预览使用，请勿使用在正式场合
-     * @param text
-     */
+
     public void setText(String text){
         this.text = text;
         centerView.setText(text);

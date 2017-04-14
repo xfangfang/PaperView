@@ -19,7 +19,7 @@ import java.util.Date;
  * Created by FANGs on 2017/3/22.
  */
 
-class BatteryAndClockView extends View {
+public class BatteryAndClockView extends View {
     private BroadcastReceiver batteryReceiver;
     private TimeReceiver timeReceiver;
     private Context context;
