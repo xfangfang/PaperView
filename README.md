@@ -4,7 +4,8 @@
 ### 简介
 
  PaperView 是一个快捷开发Android小说app必备的组件。能够大大减少开发人员开发阅读器所占用的时间。
- 
+ ![shot](https://github.com/xfangfang/PaperView/blob/master/readme/shot.jpg?raw=true)
+ ![gif](https://github.com/xfangfang/PaperView/blob/master/readme/anim.gif?raw=true)
 
 
 ### 功能
