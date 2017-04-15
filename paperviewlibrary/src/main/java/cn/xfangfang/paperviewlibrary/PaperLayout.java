@@ -3,6 +3,7 @@ package cn.xfangfang.paperviewlibrary;
 import android.content.Context;
 import android.graphics.Typeface;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.VelocityTracker;
 import android.view.View;
@@ -172,14 +173,14 @@ public class PaperLayout extends ViewGroup{
                             }
                         }
                     }else{
-//                        Log.e(TAG, "onTouchEvent: 右部点击" );
+                        Log.e(TAG, "onTouchEvent: 右部点击" );
                         if(pageListener != null){
                             ArrayList<String> lineText = pageListener.toNextPage();
                             if(lineText == null){
                                 if(stateListener != null){
                                     stateListener.toEnd();
                                 }
-//                                Log.e(TAG, "onTouchEvent: 触礁了"  );
+                                Log.e(TAG, "onTouchEvent: 触礁了"  );
                                 rightView.setText("");
                             }else {
                                 AutoTextView temp = leftView;
@@ -192,6 +193,7 @@ public class PaperLayout extends ViewGroup{
                                 leftView.offsetLeftAndRight(-getWidth());
                                 centerView.offsetLeftAndRight(-getWidth());
                                 rightView.offsetLeftAndRight(-getWidth());
+
                             }
                         }
 

@@ -28,9 +28,10 @@ public class MainActivity extends AppCompatActivity {
         paperView.setText(getResources().getString(R.string.three_country));
         paperView.setTextLine(17);
         paperView.setTextSize(17);
-        paperView.setTextColor("#00ff00");
+        paperView.setContentTextColor("#002505");
+        paperView.setInfoTextColor("#8a000000");
         paperView.setExtraInfo("haha");
-        paperView.setBackgroundColor(Color.RED);
+        paperView.setBackgroundColor(Color.parseColor("#C8E6C9"));
         paperView.setPage(0);
         paperView.setOnPaperViewStateListener(new PaperLayout.StateListener() {
             @Override

@@ -4,14 +4,10 @@
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <cn.xfangfang.paperviewdemo.AutoTextView
+    <cn.xfangfang.paperviewlibrary.AutoTextView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:paddingLeft="16dp"
         android:paddingRight="32dp"
-        android:text="@string/three_country"
-        android:visibility="gone"/>
-    <cn.xfangfang.paperviewdemo.BatteryAndClockView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
+        android:text="@string/three_country"/>
 </LinearLayout>

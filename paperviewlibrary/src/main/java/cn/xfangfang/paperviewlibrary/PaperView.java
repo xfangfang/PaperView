@@ -19,6 +19,7 @@ public class PaperView extends FrameLayout {
 
     private String paperView_text = "";
     private int paperView_textColor = 0x8A000000;
+    private int paperView_info_textColor = 0x8A000000;
     private int paperView_textSize = 16;
     private int paperView_textLine = 15;
     private Paint mPaint;
@@ -168,7 +169,7 @@ public class PaperView extends FrameLayout {
             len = i.length();
             do {
                 int width = getWidth();
-                if (width == 0) width = 1080;
+                if (width == 0) width = getResources().getDisplayMetrics().widthPixels;
                 breakTextNumber = mPaint.breakText(i, start, len, true, width - contentPadding * 2, null);
 
                 isAdded = false;
@@ -198,21 +199,6 @@ public class PaperView extends FrameLayout {
         return ans;
     }
 
-
-    /**
-     * 获取指定单位对应的原始大小（根据设备信息）
-     * px,dip,sp -> px
-     * <p>
-     * Paint.setTextSize()单位为px
-     * <p>
-     * <p>
-     * <p>
-     * 代码摘自：TextView.setTextSize()
-     *
-     * @param unit TypedValue.COMPLEX_UNIT_*
-     * @param size
-     * @return
-     */
     public float getRawSize(int unit, float size) {
         Context c = getContext();
         Resources r;
@@ -234,13 +220,17 @@ public class PaperView extends FrameLayout {
         this.paperView_extraInfo.setText(info);
     }
 
-    public void setTextColor(String color) {
+    public void setContentTextColor(String color) {
         this.paperView_textColor = Color.parseColor(color);
         this.paperLayout.setTextColor(paperView_textColor);
-        this.paperView_batteryAndClock.setPaintColor(paperView_textColor);
-        this.paperView_extraInfo.setTextColor(paperView_textColor);
-        this.paperView_position.setTextColor(paperView_textColor);
-        this.paperView_name.setTextColor(paperView_textColor);
+    }
+
+    public void setInfoTextColor(String color){
+        this.paperView_info_textColor = Color.parseColor(color);
+        this.paperView_batteryAndClock.setPaintColor(paperView_info_textColor);
+        this.paperView_extraInfo.setTextColor(paperView_info_textColor);
+        this.paperView_position.setTextColor(paperView_info_textColor);
+        this.paperView_name.setTextColor(paperView_info_textColor);
     }
 
     public void setTextSize(float textSize) {
@@ -251,6 +241,7 @@ public class PaperView extends FrameLayout {
 
     }
 
+    private static final String TAG = "PaperView";
     public void setTextLine(int line) {
         if (line < 2) {
             line = 2;

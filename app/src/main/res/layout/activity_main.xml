@@ -10,6 +10,7 @@
        android:layout_width="match_parent"
        android:layout_height="match_parent"
        app:textSize="16sp"
-       app:textLine="15"/>
+       app:textLine="15"
+       app:text="@string/three_country"/>
 
 </LinearLayout>

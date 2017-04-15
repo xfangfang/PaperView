@@ -2,6 +2,7 @@ package cn.xfangfang.paperviewlibrary;
 
 import android.content.Context;
 import android.graphics.Canvas;
+import android.support.v7.widget.AppCompatTextView;
 import android.text.Layout;
 import android.text.StaticLayout;
 import android.text.TextPaint;
@@ -9,12 +10,7 @@ import android.util.AttributeSet;
 
 import java.util.ArrayList;
 
-/**
- * Created by FANGs on 2017/3/22.
- */
-
-public class AutoTextView extends android.support.v7.widget.AppCompatTextView {
-
+class AutoTextView extends AppCompatTextView {
     private int mLineY;
     private int mViewWidth;
     private int mViewHeight;
@@ -22,13 +18,14 @@ public class AutoTextView extends android.support.v7.widget.AppCompatTextView {
     private int wordHeight;
     private Layout layout;
     private int mLines = 15;
-    private float startX = 0, startY = 0;
+    private float startX = 0.0F;
+    private float startY = 0.0F;
     private ArrayList<String> lineModeText;
     private boolean isLineMode = false;
     private int textColor = 0x8a000000;
+    private static final String TAG = "AutoTextView";
 
-
-    public AutoTextView(Context c){
+    public AutoTextView(Context c) {
         super(c);
     }
 
@@ -36,110 +33,96 @@ public class AutoTextView extends android.support.v7.widget.AppCompatTextView {
         super(context, attrs);
     }
 
-    @Override
     protected void onLayout(boolean changed, int left, int top, int right, int bottom) {
         super.onLayout(changed, left, top, right, bottom);
     }
 
-    private static final String TAG = "AutoTextView";
-
-    @Override
     protected void onDraw(Canvas canvas) {
-        TextPaint paint = getPaint();
-        paint.drawableState = getDrawableState();
-        mViewWidth = getWidth() - getPaddingLeft() - getPaddingRight();
-        mViewHeight = getHeight();
-        wordHeight = (int) (paint.getFontMetrics().descent - paint.getFontMetrics().ascent);
-        mSpaceHeight = (mViewHeight - mLines * wordHeight) / (mLines - 1);
-//        Log.e(TAG, "onDraw: padding"+getPaddingLeft()+" "+getPaddingRight()+" width "+mViewWidth );
-        startX = getPaddingLeft();
-
-        drawText(canvas);
-
+        TextPaint paint = this.getPaint();
+        paint.drawableState = this.getDrawableState();
+        this.mViewWidth = this.getWidth() - this.getPaddingLeft() - this.getPaddingRight();
+        this.mViewHeight = this.getHeight();
+        this.wordHeight = (int)(paint.getFontMetrics().descent - paint.getFontMetrics().ascent);
+        this.mSpaceHeight = (this.mViewHeight - this.mLines * this.wordHeight) / (this.mLines - 1);
+        this.startX = (float)this.getPaddingLeft();
+        this.drawText(canvas);
     }
 
     private void drawText(Canvas canvas) {
-        TextPaint paint = getPaint();
-//        Log.e(TAG, "drawText: 颜色"+textColor );
-        paint.setColor(textColor);
-        paint.drawableState = getDrawableState();
-        String text = (String) getText();
-        mLineY = (int) (startY + 0.5);
-        mLineY += getTextSize();
-        if(isLineMode){
-            //使用行模式绘制文字
-            for (int i=0; i<lineModeText.size(); i++) {
-                String line = lineModeText.get(i);
-//                Log.e(TAG, "drawText: 绘制-->"+line );
-                float width = StaticLayout.getDesiredWidth(line, 0, line.length(), getPaint());
-//                Log.e(TAG, "drawText: line Width "+width );
-                if (needScale(line)) {
-                    drawScaledText(canvas, line, width);
+        TextPaint paint = this.getPaint();
+        paint.setColor(this.textColor);
+        paint.drawableState = this.getDrawableState();
+        String text = (String)this.getText();
+        this.mLineY = (int)((double)this.startY + 0.5D);
+        this.mLineY = (int)((float)this.mLineY + this.getTextSize());
+        int i;
+        if(this.isLineMode) {
+            for(i = 0; i < this.lineModeText.size(); ++i) {
+                String lineStart = (String)this.lineModeText.get(i);
+                float lineEnd = StaticLayout.getDesiredWidth(lineStart, 0, lineStart.length(), this.getPaint());
+                if(this.needScale(lineStart)) {
+                    this.drawScaledText(canvas, lineStart, lineEnd);
                 } else {
-                    canvas.drawText(line, startX, mLineY, paint);
+                    canvas.drawText(lineStart, this.startX, (float)this.mLineY, paint);
                 }
-                mLineY += mSpaceHeight + wordHeight;
+
+                this.mLineY += this.mSpaceHeight + this.wordHeight;
             }
-        }else {
-            //使用TextView默认模式绘制文字
-            layout = getLayout();
-            for (int i = 0; i < layout.getLineCount() && i < mLines; i++) {
-                int lineStart = layout.getLineStart(i);
-                int lineEnd = layout.getLineEnd(i);
-                String line = text.substring(lineStart, lineEnd);
-                float width = StaticLayout.getDesiredWidth(text, lineStart, lineEnd, getPaint());
-                if (needScale(line) && i < layout.getLineCount() - 1) {
-                    drawScaledText(canvas, line, width);
+        } else {
+            this.layout = this.getLayout();
+
+            for(i = 0; i < this.layout.getLineCount() && i < this.mLines; ++i) {
+                int var9 = this.layout.getLineStart(i);
+                int var10 = this.layout.getLineEnd(i);
+                String line = text.substring(var9, var10);
+                float width = StaticLayout.getDesiredWidth(text, var9, var10, this.getPaint());
+                if(this.needScale(line) && i < this.layout.getLineCount() - 1) {
+                    this.drawScaledText(canvas, line, width);
                 } else {
-                    canvas.drawText(line, startX, mLineY, paint);
+                    canvas.drawText(line, this.startX, (float)this.mLineY, paint);
                 }
-                mLineY += mSpaceHeight + wordHeight;
+
+                this.mLineY += this.mSpaceHeight + this.wordHeight;
             }
         }
+
     }
 
     private void drawScaledText(Canvas canvas, String line, float lineWidth) {
-        float x = startX;
-        float d = (mViewWidth - lineWidth) / (line.length() - 1);
-        for (int i = 0; i < line.length(); i++) {
+        float x = this.startX;
+        float d = ((float)this.mViewWidth - lineWidth) / (float)(line.length() - 1);
+
+        for(int i = 0; i < line.length(); ++i) {
             String c = String.valueOf(line.charAt(i));
-            float cw = StaticLayout.getDesiredWidth(c, getPaint());
-            canvas.drawText(c, x, mLineY, getPaint());
+            float cw = StaticLayout.getDesiredWidth(c, this.getPaint());
+            canvas.drawText(c, x, (float)this.mLineY, this.getPaint());
             x += cw + d;
         }
+
     }
 
     private boolean needScale(String line) {
-        if (line.length() == 0) {
-            return false;
-        } else {
-            return line.charAt(line.length() - 1) != '\n';
-        }
+        return line.length() == 0?false:line.charAt(line.length() - 1) != 10;
     }
 
     public void setLines(int lines) {
-        mLines = lines;
-        postInvalidate();
+        this.mLines = lines;
+        this.postInvalidate();
     }
 
-
-
-    /**
-     * 行模式设置显示内容
-     * @param t 中元素为每行显示的文字
-     */
-    public void setLineModeText(ArrayList<String> t){
-        isLineMode = true;
+    public void setLineModeText(ArrayList<String> t) {
+        this.isLineMode = true;
         if(t != null) {
             this.lineModeText = t;
-        }else{
-            this.lineModeText = new ArrayList<>();
+        } else {
+            this.lineModeText = new ArrayList();
         }
-        postInvalidate();
+
+        this.postInvalidate();
     }
 
-    public void setTextColor(int color){
+    public void setTextColor(int color) {
         this.textColor = color;
-        postInvalidate();
+        this.postInvalidate();
     }
 }
