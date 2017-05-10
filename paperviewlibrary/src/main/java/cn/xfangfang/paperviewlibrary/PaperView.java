@@ -6,7 +6,6 @@ import android.content.res.TypedArray;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -134,7 +133,7 @@ public class PaperView extends FrameLayout {
                 if (currentPage == 0) {
                     updatePosition();
                     if (getPreChapter()) {
-                        Log.e(TAG, "toPrePage: 取前一章");
+//                        Log.e(TAG, "toPrePage: 取前一章");
                         if (paperView_pre_text != null) {
                             return preLineText.get(pre_wholePage - 1);
                         }
@@ -367,7 +366,7 @@ public class PaperView extends FrameLayout {
         return paperView_textSize;
     }
 
-    private static final String TAG = "PaperView";
+//    private static final String TAG = "PaperView";
 
     public void setTextLine(int line) {
         if (line < 3) {

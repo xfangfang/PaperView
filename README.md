@@ -21,14 +21,14 @@
 
 - Gradle
 
-      compile 'cn.xfangfang:paperviewlibrary:1.0.2'
+      compile 'cn.xfangfang:paperviewlibrary:1.0.3'
       
 - Maven
 
       <dependency>
         <groupId>cn.xfangfang</groupId>
         <artifactId>paperviewlibrary</artifactId>
-        <version>1.0.2</version>
+        <version>1.0.3</version>
         <type>pom</type>
       </dependency>
   
@@ -59,27 +59,29 @@
     paperView.setPage(0);
     //设置位置，小于等于0为首页，一个很大的数为尾页
     
-    paperView.setOnPaperViewStateListener(new PaperLayout.StateListener() {
-        @Override
-        public void toStart() {
-            Toast.makeText(getBaseContext(),"到头了",Toast.LENGTH_SHORT).show();
-        }
+    详情见DEMO
     
-        @Override
-        public void toEnd() {
-            Toast.makeText(getBaseContext(),"结束了",Toast.LENGTH_SHORT).show();
-        }
-    
-        @Override
-        public void centerClicked() {
-            Toast.makeText(getBaseContext(),"点击了中部",Toast.LENGTH_SHORT).show();
-        }
-    });
-    //用来监听阅读器状态，在一章开始和结束时触发
-    //以及中间点击监听
-    
+###更新
+    -  优化 降低翻页触发速度
+    -  优化 增加翻页动画时长
+    -  优化 最低支持至api9
+    -  优化 增大文字和上下工具栏的距离
+    -  优化 显示最小行数修改为三行
+    -  修复 在最后一页减小字体、行数等会显示首页
+    -  修复 在onCreat中设置文字，文字会重叠
+    -  修复 设置ContentPadding时，文字会重叠
+    -  修复 设置ContentPadding时，段尾超出界限
+    -  修复 多次设置文字，不跳转回首页
+    -  修复在低安卓版本上单击换页时显示为空
+    -  修复滑动并退回到原位时，被判定为单击
+    -  增加 设置前后两章切换的监听器
+    -  增加翻页触发速度设置
+    -  增加 翻页动画时长设置
+    -  增加 轻微滑动敏感度设置
+    -  增加 一个完整的小说阅读APP源码
+
 ### 说明
-    字体文件来源于网络，仅供测试使用，如有侵权请站内联系（是可以站内联系的吧？）
+    字体文件及小说资源来自于网络，仅供测试使用，如有侵权请站内联系（是可以站内联系的吧？）
     本组件仅在魅族Pro6s android 6.0测试通过，不能保证其他设备正常使用。
     
     

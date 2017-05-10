@@ -43,7 +43,7 @@ def siteUrl = 'https://github.com/xfangfang/PaperView'
 def gitUrl = 'git@github.com:xfangfang/PaperView.git'
 
 group = "cn.xfangfang"
-version = "1.0.2"
+version = "1.0.3"
 
 install {
     repositories.mavenInstaller {
@@ -106,8 +106,8 @@ bintray {
         name = "paperviewlibrary"
         userOrg = 'fndroid'
         version {
-            name = '1.0.2'
-            desc = 'now you can use'
+            name = '1.0.3'
+            desc = 'add new feature'
         }
         websiteUrl = siteUrl
         vcsUrl = gitUrl
