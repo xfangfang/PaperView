@@ -1,12 +1,10 @@
 package cn.xfangfang.paperviewdemo;
 
-import org.litepal.crud.DataSupport;
-
 /**
  * Created by FANGs on 2017/2/9.
  */
 
-class Chapter extends DataSupport {
+class Chapter  {
     String url,name;
 
     Chapter(String url, String name){

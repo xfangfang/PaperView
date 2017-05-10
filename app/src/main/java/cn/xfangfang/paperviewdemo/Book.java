@@ -1,14 +1,12 @@
 package cn.xfangfang.paperviewdemo;
 
-import org.litepal.crud.DataSupport;
-
 import java.io.Serializable;
 
 /**
  * Created by FANGs on 2017/1/25.
  */
 
-class Book extends DataSupport implements Serializable{
+class Book implements Serializable{
 
     private int readPosition, readPositionPage,lastReadTime;
     //lastCid上次目录缓存位置
