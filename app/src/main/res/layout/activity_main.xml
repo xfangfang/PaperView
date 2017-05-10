@@ -5,12 +5,40 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
-   <cn.xfangfang.paperviewlibrary.PaperView
-       android:id="@+id/paper_view"
-       android:layout_width="match_parent"
-       android:layout_height="match_parent"
-       app:textSize="16sp"
-       app:textLine="15"
-       app:text="@string/three_country"/>
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="2dp"
+        android:layout_marginLeft="8dp"
+        android:layout_marginRight="8dp"
+        android:layout_marginTop="2dp"
+        android:layout_marginBottom="8dp"
+        android:background="#8a000000"
+        />
+
+    <TextView
+        android:background="@color/cardview_dark_background"
+        android:textColor="@color/cardview_light_background"
+        android:padding="8dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:fontFamily="cursive"
+        android:text="PaperView Demo"
+        android:textAlignment="center"
+        android:textSize="30sp"
+        android:textStyle="bold" />
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="2dp"
+        android:layout_marginLeft="8dp"
+        android:layout_marginRight="8dp"
+        android:layout_marginTop="8dp"
+
+        android:background="#8a000000"
+        />
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/recylerview_book"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"/>
 
 </LinearLayout>

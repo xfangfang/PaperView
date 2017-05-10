@@ -1,7 +1,6 @@
 <resources>
     <string name="app_name">PaperView Demo</string>
-    <string name="three_country">
-        滚滚长江东逝水，浪花淘尽英雄。\n
+    <string name="three_country">滚滚长江东逝水，浪花淘尽英雄。\n
         是非成败转头空。\n
         青山依旧在，几度夕阳红。\n
         白发渔樵江渚上，惯看秋月春风。\n

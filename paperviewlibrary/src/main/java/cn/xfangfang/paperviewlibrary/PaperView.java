@@ -6,9 +6,11 @@ import android.content.res.TypedArray;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewTreeObserver;
 import android.widget.FrameLayout;
 import android.widget.TextView;
 
@@ -17,22 +19,23 @@ import java.util.ArrayList;
 
 public class PaperView extends FrameLayout {
 
-    private String paperView_text = "";
+    private String paperView_text, paperView_pre_text = null, paperView_next_text = null;
     private int paperView_textColor = 0x8A000000;
     private int paperView_info_textColor = 0x8A000000;
-    private int paperView_textSize = 16;
-    private int paperView_textLine = 15;
+    private int paperView_textSize = 18;
+    private int paperView_textLine = 17;
     private Paint mPaint;
     private int currentPage = 0;
-    private int wholePage = 0;
+    private int wholePage = 0, pre_wholePage = 0x3f3f3f, next_wholePage = 0x3f3f3f, cur_wholePage = 0x3f3f3f;
     private int contentPadding = 16;
-    private ArrayList<ArrayList<String>> lineText;
+    private ArrayList<ArrayList<String>> lineText, preLineText, nextLineText;
 
 
     private TextView paperView_name, paperView_position, paperView_extraInfo;
     private BatteryAndClockView paperView_batteryAndClock;
     private PaperLayout paperLayout;
     private Context context;
+    private onPageStateLinstener pageStateListener;
 
     public PaperView(Context context) {
         super(context);
@@ -56,16 +59,13 @@ public class PaperView extends FrameLayout {
         final TypedArray a = getContext().obtainStyledAttributes(
                 attrs, R.styleable.PaperView, defStyle, 0);
 
-        if(a.hasValue(R.styleable.PaperView_textLine)){
-            paperView_textLine = a.getInt(R.styleable.PaperView_textLine,15);
+        if (a.hasValue(R.styleable.PaperView_textLine)) {
+            paperView_textLine = a.getInt(R.styleable.PaperView_textLine, 17);
         }
-        if(a.hasValue(R.styleable.PaperView_text)){
-            paperView_text = a.getString(R.styleable.PaperView_text);
-        }
-        if(a.hasValue(R.styleable.PaperView_textColor)){
+        if (a.hasValue(R.styleable.PaperView_textColor)) {
             paperView_textColor = a.getColor(R.styleable.PaperView_textColor, Color.BLACK);
         }
-        if(a.hasValue(R.styleable.PaperView_textSize)){
+        if (a.hasValue(R.styleable.PaperView_textSize)) {
             paperView_textSize = a.getDimensionPixelSize(R.styleable.PaperView_textSize, (int) (16 * context.getResources().getDisplayMetrics().scaledDensity + 0.5));
             paperView_textSize /= context.getResources().getDisplayMetrics().scaledDensity;
         }
@@ -84,9 +84,8 @@ public class PaperView extends FrameLayout {
 
         paperView_batteryAndClock.registerBatteryReceiver();
         paperLayout.setTextSize(paperView_textSize);
-        if (paperView_textLine < 2) paperView_textLine = 2;
+        if (paperView_textLine < 3) paperView_textLine = 3;
         paperLayout.setTextLine(paperView_textLine);
-        paperLayout.setText(paperView_text);
         paperLayout.setContentPadding((int) getRawSize(TypedValue.COMPLEX_UNIT_DIP, contentPadding));
         paperLayout.setTextColor(paperView_textColor);
 
@@ -94,48 +93,156 @@ public class PaperView extends FrameLayout {
             @Override
             public ArrayList<String> toPrePage() {
 
-
-//                Log.e(TAG, "当前页码 " + (currentPage + 1));
                 if (currentPage == 0) {
-//                    Log.e(TAG, "1上一条错了 当前页码 " + (currentPage + 1));
-                    updatePosition();
-                    return null;
+                    if (pageStateListener != null) {
+                        pageStateListener.decChapter();
+                    }
+                    if (getPreChapter()) {
+                        if (paperView_pre_text == null) {
+                            //如果没有加载出来，会显示正在加载上一章
+                            pageStateListener.incChapter();
+                            pageStateListener.isStartPoint();
+                            return null;
+                        }
+                        next_wholePage = cur_wholePage;
+                        nextLineText = lineText;
+                        paperView_next_text = paperView_text;
+                        currentPage = pre_wholePage - 1;
+                        cur_wholePage = pre_wholePage;
+                        lineText = preLineText;
+                        paperView_text = paperView_pre_text;
+
+                        paperView_pre_text = null;
+
+                        updatePosition();
+                        if (lineText.size() == 1) {
+                            if (pageStateListener != null) {
+                                pageStateListener.getPreChapter();
+                                if (preLineText != null) return preLineText.get(pre_wholePage - 1);
+                            }
+                            return new ArrayList<>();
+                        }
+                        return lineText.get(currentPage - 1);
+                    } else {
+                        if (pageStateListener != null) {
+                            pageStateListener.isStartPoint();
+                        }
+                        return null;
+                    }
                 }
                 currentPage--;
                 if (currentPage == 0) {
-//                    Log.e(TAG, "2上一条错了 当前页码 " + (currentPage + 1));
                     updatePosition();
-                    return new ArrayList<>();
+                    if (getPreChapter()) {
+                        Log.e(TAG, "toPrePage: 取前一章");
+                        if (paperView_pre_text != null) {
+                            return preLineText.get(pre_wholePage - 1);
+                        }
+                        return new ArrayList<>();
+                    } else {
+                        if (pageStateListener != null) {
+                            pageStateListener.isStartPoint();
+                        }
+                        return new ArrayList<>();
+                    }
+                } else {
+                    updatePosition();
+                    return lineText.get(currentPage - 1);
                 }
-
-
-                updatePosition();
-                return lineText.get(currentPage - 1);
             }
 
             @Override
             public ArrayList<String> toNextPage() {
-
-
-//                Log.e(TAG, "当前页码 " + (currentPage + 1));
                 if (currentPage == lineText.size() - 1) {
-//                    Log.e(TAG, "3上一条错了 当前页码 " + (currentPage + 1));
-                    updatePosition();
+                    if (pageStateListener != null) {
+                        pageStateListener.incChapter();
+                    }
+                    if (getNextChapter()) {
+                        if (paperView_next_text == null) {
+                            pageStateListener.decChapter();
+                            pageStateListener.isEndPoint();
+                            return null;
+                        }
+                        pre_wholePage = cur_wholePage;
+                        preLineText = lineText;
+                        paperView_pre_text = paperView_text;
+                        currentPage = 0;
+                        cur_wholePage = next_wholePage;
+                        lineText = nextLineText;
+                        paperView_text = paperView_next_text;
+
+                        paperView_next_text = null;
+
+                        updatePosition();
+                        if (lineText.size() == 1) {
+                            if (pageStateListener != null) {
+                                pageStateListener.getNextChapter();
+                                if (nextLineText != null) return nextLineText.get(0);
+                            }
+                            return new ArrayList<>();
+                        } else {
+                            return lineText.get(1);
+                        }
+                    }else if (pageStateListener != null) {
+                        pageStateListener.isEndPoint();
+                    }
                     return null;
                 }
                 currentPage++;
-                if (currentPage == lineText.size() - 1) {
-//                    Log.e(TAG, "4上一条错了 当前页码 " + (currentPage + 1));
-                    updatePosition();
-                    return new ArrayList<>();
-                }
 
-                updatePosition();
-                return lineText.get(currentPage + 1);
+                if (currentPage == lineText.size() - 1) {
+                    updatePosition();
+                    if (getNextChapter()) {
+                        if (paperView_next_text != null) {
+                            return nextLineText.get(0);
+                        }
+                        return new ArrayList<>();
+                    } else {
+                        if (pageStateListener != null) {
+                            pageStateListener.isEndPoint();
+                        }
+                        return new ArrayList<>();
+                    }
+                } else {
+                    updatePosition();
+                    return lineText.get(currentPage + 1);
+                }
+            }
+        });
+        paperLayout.setOnStateListener(new PaperLayout.StateListener() {
+            @Override
+            public void toStart() {
+                if (pageStateListener != null) {
+                    pageStateListener.isStartPoint();
+                }
+            }
+
+            @Override
+            public void toEnd() {
+                if (pageStateListener != null) {
+                    pageStateListener.isEndPoint();
+                }
+            }
+
+            @Override
+            public void centerClicked() {
+                if (pageStateListener != null) {
+                    pageStateListener.centerClicked();
+                }
             }
         });
 
         mPaint = new Paint();
+        getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+                    @Override
+                    public void onGlobalLayout() {
+                        if (paperView_text == null) paperView_text = "";
+                        setText(paperView_text);
+                        getViewTreeObserver()
+                                .removeGlobalOnLayoutListener(this);
+                    }
+                });
+
 
     }
 
@@ -145,10 +252,16 @@ public class PaperView extends FrameLayout {
         paperView_batteryAndClock.unregisterBatteryReceiver();
     }
 
-//    private static final String TAG = "PaperView";
-
     private void updatePosition() {
-        paperView_position.setText((currentPage + 1) + "/" + (lineText.size()));
+        if (lineText == null) {
+
+        } else {
+            paperView_position.setText(String.valueOf(currentPage + 1) + "/" + String.valueOf(cur_wholePage));
+        }
+
+        if(pageStateListener != null){
+            pageStateListener.onEveryPageLoad(currentPage+1,cur_wholePage);
+        }
     }
 
     private ArrayList<ArrayList<String>> splitArticle(String article) {
@@ -163,15 +276,21 @@ public class PaperView extends FrameLayout {
         int line = 0;
         boolean isAdded = false;//当前页面是否加入最终页面
 
-        String[] sec = article.split("\n");//按段进行分割
+        String[] sec = article.split("\n");
         for (int p = 0; p < sec.length; p++) {
             String i = sec[p] + "\n";
             len = i.length();
             do {
                 int width = getWidth();
                 if (width == 0) width = getResources().getDisplayMetrics().widthPixels;
-                breakTextNumber = mPaint.breakText(i, start, len, true, width - contentPadding * 2, null);
-
+                breakTextNumber = mPaint.breakText(
+                        i,
+                        start,
+                        len,
+                        true,
+                        width - getRawSize(TypedValue.COMPLEX_UNIT_DIP, contentPadding) * 2,
+                        null
+                );
                 isAdded = false;
                 if (!i.substring(start, start + breakTextNumber).isEmpty()) {
                     res.add(i.substring(start, start + breakTextNumber));//添加一行内容
@@ -195,7 +314,6 @@ public class PaperView extends FrameLayout {
         }
         if (!isAdded) ans.add(res);
         wholePage = ans.size();
-//        Log.e(TAG, "splitArticle: 分割完毕 页数 " + wholePage);
         return ans;
     }
 
@@ -212,8 +330,12 @@ public class PaperView extends FrameLayout {
     }
 
     public void setContentPadding(int contentPadding) {
+        if (contentPadding > 64) {
+            contentPadding = 64;
+        }
         this.contentPadding = contentPadding;
         paperLayout.setContentPadding((int) getRawSize(TypedValue.COMPLEX_UNIT_DIP, contentPadding));
+        updateView();
     }
 
     public void setExtraInfo(String info) {
@@ -225,7 +347,7 @@ public class PaperView extends FrameLayout {
         this.paperLayout.setTextColor(paperView_textColor);
     }
 
-    public void setInfoTextColor(String color){
+    public void setInfoTextColor(String color) {
         this.paperView_info_textColor = Color.parseColor(color);
         this.paperView_batteryAndClock.setPaintColor(paperView_info_textColor);
         this.paperView_extraInfo.setTextColor(paperView_info_textColor);
@@ -237,75 +359,118 @@ public class PaperView extends FrameLayout {
 
         paperView_textSize = (int) textSize;
         paperLayout.setTextSize(textSize);
-        setText(paperView_text);
+        updateView();
 
     }
 
+    public int getTextSize() {
+        return paperView_textSize;
+    }
+
     private static final String TAG = "PaperView";
+
     public void setTextLine(int line) {
-        if (line < 2) {
-            line = 2;
+        if (line < 3) {
+            line = 3;
         }
 
         paperView_textLine = line;
         paperLayout.setTextLine(line);
-        setText(paperView_text);
+        updateView();
     }
 
-    public void setText(String text) {
-        this.paperView_text = text;
-        this.paperLayout.setVisibility(VISIBLE);
-        lineText = splitArticle(paperView_text);
-        updatePosition();
-        if (lineText != null) {
-            if (lineText.size() == 1) {
-                paperLayout.initViewText(null, lineText.get(0), null);
-            } else {
-                paperLayout.initViewText(null, lineText.get(0), lineText.get(1));
-            }
-        }
+    public int getTextLine() {
+        return paperView_textLine;
+    }
 
+
+    public void updateView() {
+        lineText = splitArticle(paperView_text);
+        cur_wholePage = wholePage;
+        setPage(currentPage + 1);
     }
 
     public void setPage(int pageNum) {
         if (lineText == null) {
-//            Log.e(TAG, "setPage: 还没设置文字呢");
             return;
         }
         this.currentPage = pageNum - 1;
-        if (currentPage < 0) {
+        if (currentPage <= 0) {
             currentPage = 0;
-        } else if (currentPage >= lineText.size()) {
+            getPreChapter();
+        }
+        if (currentPage >= lineText.size() - 1) {
             currentPage = lineText.size() - 1;
+            getNextChapter();
         }
         updatePosition();
 
-        if(currentPage > 0 && currentPage + 1 <= lineText.size() - 1) {
+        if (currentPage > 0 && currentPage + 1 <= lineText.size() - 1) {
             paperLayout.initViewText(
                     lineText.get(currentPage - 1),
                     lineText.get(currentPage),
                     lineText.get(currentPage + 1)
             );
-        }
-        else if(currentPage == 0 && lineText.size() >= 2) {
-            paperLayout.initViewText(
-                    null,
-                    lineText.get(currentPage),
-                    lineText.get(currentPage + 1)
-            );
-        }
-        else if(currentPage == lineText.size()-1 &&  lineText.size() >= 2 ) {
-            paperLayout.initViewText(
-                    lineText.get(currentPage - 1),
-                    lineText.get(currentPage),
-                    null
-            );
-        }else {
-            paperLayout.initViewText(
-                    null,
-                    lineText.get(currentPage),
-                    null
-            );
+        } else if (currentPage == 0 && lineText.size() >= 2) {
+            if (preLineText != null) {
+                paperLayout.initViewText(
+                        preLineText.get(pre_wholePage - 1),
+                        lineText.get(currentPage),
+                        lineText.get(currentPage + 1)
+                );
+            } else {
+                paperLayout.initViewText(
+                        null,
+                        lineText.get(currentPage),
+                        lineText.get(currentPage + 1)
+                );
+            }
+        } else if (currentPage == lineText.size() - 1 && lineText.size() >= 2) {
+            if (nextLineText == null) {
+                paperLayout.initViewText(
+                        lineText.get(currentPage - 1),
+                        lineText.get(currentPage),
+                        null
+                );
+            } else {
+                paperLayout.initViewText(
+                        lineText.get(currentPage - 1),
+                        lineText.get(currentPage),
+                        nextLineText.get(0)
+                );
+            }
+        } else {
+            if (preLineText == null){
+                if(nextLineText == null) {
+                    paperLayout.initViewText(
+                            null,
+                            lineText.get(currentPage),
+                            null
+                    );
+
+                }else{
+                    paperLayout.initViewText(
+                            null,
+                            lineText.get(currentPage),
+                            nextLineText.get(0)
+                    );
+                }
+            }else{
+                if(nextLineText == null) {
+                    paperLayout.initViewText(
+                            preLineText.get(pre_wholePage - 1),
+                            lineText.get(currentPage),
+                            null
+                    );
+                }else{
+                    paperLayout.initViewText(
+                            preLineText.get(pre_wholePage - 1),
+                            lineText.get(currentPage),
+                            nextLineText.get(0)
+                    );
+                }
+            }
+
         }
 
     }
@@ -325,9 +490,119 @@ public class PaperView extends FrameLayout {
         paperView_name.setText(chapterName);
     }
 
-    public void setOnPaperViewStateListener(PaperLayout.StateListener l) {
-        paperLayout.setOnStateListener(l);
+    public interface onPageStateLinstener {
+
+        boolean getNextChapter();
+
+        boolean getPreChapter();
+
+        void isStartPoint();
+
+        void isEndPoint();
+
+        void centerClicked();
+
+        void incChapter();
+
+        void decChapter();
+
+        void onEveryPageLoad(int currentPage,int wholePage);
+
     }
 
+    public void setOnPageStateListener(onPageStateLinstener l) {
+        this.pageStateListener = l;
+    }
+
+    private boolean getPreChapter() {
+        if (pageStateListener != null) {
+            if (paperView_pre_text != null) {
+                return true;
+            }
+            if (pageStateListener.getPreChapter()) {
+                return true;
+            } else {
+                paperView_pre_text = null;
+            }
+        }
+        return false;
+    }
+
+    private boolean getNextChapter() {
+        if (pageStateListener != null) {
+            if (paperView_next_text != null) {
+                return true;
+            }
+            if (pageStateListener.getNextChapter()) {
+                return true;
+            } else {
+                paperView_next_text = null;
+            }
+        }
+        return false;
+    }
+
+    public void setText(String text) {
+        this.paperView_text = text;
+        currentPage = 0;
+        updateView();
+    }
+
+    public void setNextChapterText(String text) {
+        this.paperView_next_text = text;
+        if (text == null) {
+            if (pageStateListener != null) {
+                pageStateListener.isEndPoint();
+                return;
+            }
+        }
+        this.nextLineText = splitArticle(text);
+        this.next_wholePage = wholePage;
+
+        paperLayout.initRightViewText(this.nextLineText.get(0));
+    }
+
+    public void setPreChapterText(String text) {
+
+        this.paperView_pre_text = text;
+        if (text == null) {
+            if (pageStateListener != null) {
+                pageStateListener.isStartPoint();
+                return;
+            }
+        }
+        this.preLineText = splitArticle(text);
+        this.pre_wholePage = wholePage;
+
+        paperLayout.initLeftViewText(this.preLineText.get(wholePage - 1));
+
+    }
+
+    /**
+     * 设置触摸灵敏度
+     * 默认值为0
+     * @param ratio 系数 0-1
+     */
+    public void setTouchSlop(float ratio){
+        paperLayout.setTouchSlop(ratio);
+    }
+
+    /**
+     * 设置滑动翻页的动画时长
+     * 默认值为0
+     * @param ratio 系数 0-1
+     */
+    public void setAnimateTime(float ratio){
+        paperLayout.setAnimateTime(ratio);
+    }
+
+    /**
+     * 设置快速滑动以达到翻页的触发速度
+     * 默认值为0
+     * @param ratio 系数 0-1
+     */
+    public void setVelocityRatio(float ratio){
+        paperLayout.setVelocityRatio(ratio);
+    }
 
 }

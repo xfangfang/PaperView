@@ -9,7 +9,11 @@
         android:id="@+id/paper_view_name"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="8dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginLeft="8dp"
+        android:layout_marginRight="8dp"
+        android:layout_marginBottom="16dp"
+
         tools:text="章节名称" />
 
     <cn.xfangfang.paperviewlibrary.PaperLayout
@@ -22,8 +26,10 @@
         android:id="@+id/paper_view_info"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_margin="8dp">
+        android:layout_marginTop="16dp"
+        android:layout_marginLeft="8dp"
+        android:layout_marginRight="8dp"
+        android:layout_marginBottom="8dp">
 
         <cn.xfangfang.paperviewlibrary.BatteryAndClockView
             android:id="@+id/paper_view_battery_clock"

@@ -1,14 +1,13 @@
 apply plugin: 'com.android.library'
 apply plugin: 'com.github.dcendents.android-maven'
 apply plugin: 'com.jfrog.bintray'
-//apply plugin: 'com.novoda.bintray-release'
 
 android {
     compileSdkVersion 25
     buildToolsVersion "25.0.0"
 
     defaultConfig {
-        minSdkVersion 14
+        minSdkVersion 9
         targetSdkVersion 25
         versionCode 1
         versionName "1.0.1"
@@ -39,27 +38,6 @@ dependencies {
     testCompile 'junit:junit:4.12'
 }
 
-//allprojects {
-//    repositories {
-//        jcenter()
-//    }
-//    //加上这些
-//    tasks.withType(Javadoc) {
-//        options{ encoding "UTF-8"
-//            charSet 'UTF-8'
-//            links "http://docs.oracle.com/javase/7/docs/api"
-//        }
-//    }
-//}
-//
-//publish {
-//    userOrg = 'fndroid'
-//    groupId = 'cn.xfangfang'
-//    artifactId = 'paperviewlibrary'
-//    publishVersion = '1.0.1'
-//    desc = 'Oh hi, this is a nice description for a project, right?'
-//    website = 'https://github.com/xfangfang/paperview'
-//}
 
 def siteUrl = 'https://github.com/xfangfang/PaperView'
 def gitUrl = 'git@github.com:xfangfang/PaperView.git'
