@@ -36,6 +36,12 @@ public class BookReadActivity extends AppCompatActivity {
     ArrayList<Chapter> chapters;
     int chapterPosition,page;
 
+    enum ChapterPosition{
+        Current,
+        Next,
+        Pre
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -53,7 +59,7 @@ public class BookReadActivity extends AppCompatActivity {
         LinearLayoutManager lm = new LinearLayoutManager(getBaseContext());
         recyclerView.setLayoutManager(lm);
 
-        paperView.setFont("cube.ttf");
+//        paperView.setFont("cube.ttf");
 
 
     }
@@ -66,12 +72,13 @@ public class BookReadActivity extends AppCompatActivity {
         //从历史记录中读取颜色信息
         stateReader = getSharedPreferences(book.getName(), MODE_PRIVATE);
         chapterPosition = stateReader.getInt("chapterPosition",0);
-        page = stateReader.getInt("page",0);
+        page = stateReader.getInt("page",1);
+        page = 1;
 
         new getTocTask().execute(book.getUrl());
     }
 
-    class getTocTask extends AsyncTask<String, Void, Boolean> {
+    private class getTocTask extends AsyncTask<String, Void, Boolean> {
         @Override
         protected void onPreExecute() {
             progressBar.setVisibility(View.VISIBLE);
@@ -81,20 +88,7 @@ public class BookReadActivity extends AppCompatActivity {
         @Override
         protected Boolean doInBackground(String... params) {
             String url = params[0];
-            chapters = new ArrayList<>();
-            Document doc = null;
-            try {
-                doc = Jsoup.connect(url).get();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-
-            Elements content = doc.select(".content");
-            Elements catalogs = content.get(0).getElementsByTag("a");
-            for (Element j :
-                    catalogs) {
-                chapters.add(new Chapter(j.attr("href"),j.text()));
-            }
+            chapters = getChapterList(url);
             return true;
         }
 
@@ -112,9 +106,9 @@ public class BookReadActivity extends AppCompatActivity {
                     linearLayout.setVisibility(View.INVISIBLE);
                     Chapter c = chapters.get(position);
                     paperView.setChapterName(c.getName());
-                    page = 0;
+                    page = 1;
                     chapterPosition = position;
-                    new getChapterTask().execute(book.getUrl(),c.getUrl());
+                    new getChapterTask(ChapterPosition.Current,page).execute(book.getUrl(),c.getUrl());
                     stateEditor.putInt("chapterPosition",chapterPosition).apply();
                     stateEditor.putInt("page",page).apply();
                 }
@@ -130,7 +124,7 @@ public class BookReadActivity extends AppCompatActivity {
                     Snackbar.make(paperView,"取下一章",Snackbar.LENGTH_SHORT).show();
 
                     if(chapterPosition < chapters.size()-1) {
-                        new getNextChapterStringTask().execute(book.getUrl(),chapters.get(chapterPosition+1).getUrl());
+                        new getChapterTask(ChapterPosition.Next).execute(book.getUrl(),chapters.get(chapterPosition+1).getUrl());
                         return true;
                     }
                     return false;
@@ -140,8 +134,7 @@ public class BookReadActivity extends AppCompatActivity {
                 public boolean getPreChapter() {
                     Snackbar.make(paperView,"取上一章",Snackbar.LENGTH_SHORT).show();
                     if(chapterPosition >=1) {
-//                        paperView.setPreChapterText("1\n2\n3\n4\n5\n"+chapterPosition);
-                        new getPreChapterStringTask().execute(book.getUrl(),chapters.get(chapterPosition-1).getUrl());
+                        new getChapterTask(ChapterPosition.Pre).execute(book.getUrl(),chapters.get(chapterPosition-1).getUrl());
                         return true;
                     }
                     return false;
@@ -197,12 +190,24 @@ public class BookReadActivity extends AppCompatActivity {
                     stateEditor.putInt("page",currentPage).apply();
                 }
             });
-            new getChapterTask().execute(book.getUrl(),chapters.get(chapterPosition).getUrl());
+            new getChapterTask(ChapterPosition.Current,page).execute(book.getUrl(),chapters.get(chapterPosition).getUrl());
+
         }
     }
 
-    class getChapterTask extends AsyncTask<String, Void, Boolean> {
+    private class getChapterTask extends AsyncTask<String, Void, Boolean> {
         String chapter;
+        ChapterPosition chapterPosition;
+        int chapterPage;
+
+        getChapterTask(ChapterPosition chapterPosition){
+            this.chapterPosition = chapterPosition;
+        }
+
+        getChapterTask(ChapterPosition chapterPosition,int page){
+            this.chapterPosition = chapterPosition;
+            this.chapterPage = page;
+        }
 
         @Override
         protected void onPreExecute() {
@@ -213,107 +218,65 @@ public class BookReadActivity extends AppCompatActivity {
         protected Boolean doInBackground(String... params) {
             String url = params[0];
             String chapterUrl = params[1];
-            Document doc = null;
-            try {
-                doc = Jsoup.connect(url+chapterUrl).get();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            String temp = doc.toString().replaceAll("<br>","###");
-            doc = Jsoup.parse(temp);
-
-            Elements c = doc.getElementsByAttributeValue("width","100%");
-            String res = c.get(c.size()-2).text();
-            res = res.replaceAll("###","\n");
-            chapter = res;
-            return true;
-        }
-
-        @Override
-        protected void onProgressUpdate(Void... values) {
-            super.onProgressUpdate(values);
-
-        }
-
-        @Override
-        protected void onPostExecute(Boolean aBoolean) {
-            progressBar.setVisibility(View.GONE);
-            paperView.setText(chapter);
-            paperView.setPage(page);
-        }
-    }
-
-    class getNextChapterStringTask extends AsyncTask<String, Void, Boolean> {
-        String chapter;
-
-        @Override
-        protected void onPreExecute() {
-            progressBar.setVisibility(View.VISIBLE);
-        }
-
-        @Override
-        protected Boolean doInBackground(String... params) {
-            String url = params[0];
-            String chapterUrl = params[1];
-            Document doc = null;
-            try {
-                doc = Jsoup.connect(url+chapterUrl).get();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            String temp = doc.toString().replaceAll("<br>","###");
-            doc = Jsoup.parse(temp);
-
-            Elements c = doc.getElementsByAttributeValue("width","100%");
-            String res = c.get(c.size()-2).text();
-            res = res.replaceAll("###","\n");
-            chapter = res;
+            chapter = getChapter(url,chapterUrl);
             return true;
         }
 
         @Override
         protected void onPostExecute(Boolean aBoolean) {
             progressBar.setVisibility(View.GONE);
-            paperView.setNextChapterText(chapter);
-        }
-    }
-
-    class getPreChapterStringTask extends AsyncTask<String, Void, Boolean> {
-        String chapter;
-
-        @Override
-        protected void onPreExecute() {
-            progressBar.setVisibility(View.VISIBLE);
-        }
-
-        @Override
-        protected Boolean doInBackground(String... params) {
-            String url = params[0];
-            String chapterUrl = params[1];
-            Document doc = null;
-            try {
-                doc = Jsoup.connect(url+chapterUrl).get();
-            } catch (IOException e) {
-                e.printStackTrace();
+            switch (chapterPosition){
+                case Current:
+                    paperView.setText(chapter);
+                    paperView.setPage(chapterPage);
+                    break;
+                case Pre:
+                    paperView.setPreChapterText(chapter);
+                    break;
+                case Next:
+                    paperView.setNextChapterText(chapter);
+                    break;
             }
-            String temp = doc.toString().replaceAll("<br>","###");
-            doc = Jsoup.parse(temp);
-
-            Elements c = doc.getElementsByAttributeValue("width","100%");
-            String res = c.get(c.size()-2).text();
-            res = res.replaceAll("###","\n");
-            chapter = res;
-
-//            chapter = getResources().getString(R.string.three_country);
-            return true;
-        }
-
-        @Override
-        protected void onPostExecute(Boolean aBoolean) {
-            progressBar.setVisibility(View.GONE);
-            paperView.setPreChapterText(chapter);
         }
     }
+
+
+    private String getChapter(String host,String param){
+        Document doc = null;
+        try {
+            doc = Jsoup.connect(host + param).get();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        String temp = doc.toString().replaceAll("<br>","###");
+        doc = Jsoup.parse(temp);
+
+        Elements c = doc.getElementsByAttributeValue("width","100%");
+        String res = c.get(c.size()-2).text();
+        res = res.replaceAll("###","\n");
+        return res;
+    }
+
+    private ArrayList<Chapter> getChapterList(String url){
+        ArrayList<Chapter> list = new ArrayList<>();
+        Document doc = null;
+        try {
+            doc = Jsoup.connect(url).get();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        Elements content = doc.select(".content");
+        Elements catalogs = content.get(0).getElementsByTag("a");
+        for (Element j :
+                catalogs) {
+            list.add(new Chapter(j.attr("href"),j.text()));
+        }
+        return list;
+    }
+
+
+
 
     public void incLine(View view){
         paperView.setTextLine(paperView.getTextLine()+1);
