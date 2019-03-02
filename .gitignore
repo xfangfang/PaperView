@@ -6,3 +6,5 @@ local.properties
 
 /build
 
+*.iml
+*.yml
